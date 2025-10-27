@@ -1,96 +1,72 @@
-#!/usr/bin/env python3
-"""
-preprocess_mental_health.py
-
-Description:
-This script preprocesses a dataset for predicting mental health conditions.
-It performs the following steps:
-- Handles missing values
-- Encodes categorical (non-numerical) columns
-- Flags obvious outliers
-- Normalizes numeric values
-
-Usage:
-    python preprocess_mental_health.py --input raw_data.csv --output processed_data.csv --outliers outliers_report.csv
-"""
-
 import pandas as pd
 import numpy as np
-from sklearn.preprocessing import LabelEncoder, MinMaxScaler
-import argparse
+from scipy import stats
+from sklearn.preprocessing import OneHotEncoder, RobustScaler
 
-# -----------------------
-# Parse command-line arguments
-# -----------------------
-parser = argparse.ArgumentParser(description="Preprocess mental health dataset")
-parser.add_argument('--input', required=True, help='Path to input CSV file')
-parser.add_argument('--output', required=True, help='Path to save processed CSV file')
-parser.add_argument('--outliers', required=True, help='Path to save flagged outliers CSV file')
-args = parser.parse_args()
+# -----------------------------
+# 1️⃣ Load dataset
+# -----------------------------
+df = pd.read_csv("Data/sample_101_Mental_Health_Lifestyle_Dataset.csv")  # Replace with your CSV filename
+print(f"Loaded dataset with {df.shape[0]} rows and {df.shape[1]} columns.")
 
-# -----------------------
-# Load the dataset
-# -----------------------
-df = pd.read_csv(args.input)
-print(f"Initial dataset shape: {df.shape}")
-
-# -----------------------
-# 1. Handling Missing Values
-# -----------------------
-# Numeric columns: fill missing with median
-numeric_cols = df.select_dtypes(include=np.number).columns
+# -----------------------------
+# 2️⃣ Handle missing values
+# -----------------------------
+# Fill numeric columns with median
+numeric_cols = df.select_dtypes(include=['int64', 'float64']).columns
 df[numeric_cols] = df[numeric_cols].fillna(df[numeric_cols].median())
 
-# Categorical columns: fill missing with mode
-categorical_cols = df.select_dtypes(include='object').columns
+# Fill categorical columns with mode (most frequent)
+categorical_cols = df.select_dtypes(include=['object']).columns
 df[categorical_cols] = df[categorical_cols].fillna(df[categorical_cols].mode().iloc[0])
 
-print("Missing values handled.")
+# -----------------------------
+# 3️⃣ Encode categorical columns
+# -----------------------------
+# OneHotEncode all categorical columns except the target ('Mental Health Condition')
+target_col = "Mental Health Condition"
+cat_cols_to_encode = [col for col in categorical_cols if col != target_col]
 
-# -----------------------
-# 2. Encoding Categorical Columns
-# -----------------------
-# Using Label Encoding for simplicity
-le = LabelEncoder()
-for col in categorical_cols:
-    df[col] = le.fit_transform(df[col])
+encoder = OneHotEncoder(sparse_output=False, handle_unknown="ignore")
+encoded = pd.DataFrame(
+    encoder.fit_transform(df[cat_cols_to_encode]),
+    columns=encoder.get_feature_names_out(cat_cols_to_encode),
+    index=df.index
+)
 
-print("Categorical columns encoded.")
+# Drop original categorical columns that were encoded
+df = df.drop(columns=cat_cols_to_encode)
+# Concatenate encoded columns
+df = pd.concat([df, encoded], axis=1)
 
-# -----------------------
-# 3. Flag Obvious Outliers
-# -----------------------
-# Using IQR method: values outside 1.5 * IQR are flagged
-outliers_dict = {}
+# -----------------------------
+# 4️⃣ Flag obvious outliers
+# -----------------------------
+outlier_flags = pd.DataFrame(index=df.index)
 for col in numeric_cols:
+    # IQR method
     Q1 = df[col].quantile(0.25)
     Q3 = df[col].quantile(0.75)
     IQR = Q3 - Q1
-    lower_bound = Q1 - 1.5 * IQR
-    upper_bound = Q3 + 1.5 * IQR
-    outlier_rows = df[(df[col] < lower_bound) | (df[col] > upper_bound)]
-    if not outlier_rows.empty:
-        outliers_dict[col] = outlier_rows.index.tolist()
+    lower = Q1 - 1.5 * IQR
+    upper = Q3 + 1.5 * IQR
+    outlier_flags[f"{col}_outlier"] = (df[col] < lower) | (df[col] > upper)
+# Add combined row-level outlier flag
+outlier_flags["any_outlier"] = outlier_flags.any(axis=1)
 
-# Save flagged outliers
-outlier_records = []
-for col, rows in outliers_dict.items():
-    for row in rows:
-        outlier_records.append({'row_index': row, 'column': col, 'value': df.at[row, col]})
+# Save outlier report
+outlier_flags.to_csv("outliers_report.csv", index=False)
+print(f"Outlier flags saved to 'outliers_report.csv'.")
 
-outliers_df = pd.DataFrame(outlier_records)
-outliers_df.to_csv(args.outliers, index=False)
-print(f"Outliers flagged and saved to {args.outliers}")
-
-# -----------------------
-# 4. Normalize Numeric Columns
-# -----------------------
-scaler = MinMaxScaler()
+# -----------------------------
+# 5️⃣ Normalize numeric columns
+# -----------------------------
+scaler = RobustScaler()  # RobustScaler is resistant to outliers
 df[numeric_cols] = scaler.fit_transform(df[numeric_cols])
-print("Numeric columns normalized.")
 
-# -----------------------
-# Save Processed Data
-# -----------------------
-df.to_csv(args.output, index=False)
-print(f"Processed dataset saved to {args.output}")
+# -----------------------------
+# 6️⃣ Save processed dataset
+# -----------------------------
+df.to_csv("processed_data.csv", index=False)
+print(f"Processed dataset saved to 'processed_data.csv'.")
+
