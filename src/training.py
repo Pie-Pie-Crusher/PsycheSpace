@@ -18,7 +18,7 @@ import random
 # -----------------------
 # Load dataset
 # -----------------------
-data = pd.read_csv("Data/sample_101_Mental_Health_Lifestyle_Dataset.csv")
+data = pd.read_csv("Data/trainingdata.csv")
 print(f"Loaded dataset with {data.shape[0]} rows and {data.shape[1]} columns.")
 
 # -----------------------
