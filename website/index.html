@@ -1,0 +1,269 @@
+<!-- ===============================
+File: /index.html
+Project: PsycheSpace (desktop-first, responsive to 375px)
+Author: ChatGPT
+Notes:
+- Semantic HTML5 layout with <header>, <main>, <footer>
+- No frameworks. Uses CSS Grid/Flexbox only.
+- Desktop-first. Responsive down to 375px.
+- New version adds a landing screen with Proceed / Learn More, per updated PDF.
+================================== -->
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>PsycheSpace – Find Your Happiness Score</title>
+    <meta name="description" content="PsycheSpace – a friendly, privacy‑first quiz that estimates your happiness score and suggests small improvements." />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/styles/styles.css" />
+  </head>
+  <body>
+    <!-- =============================== HEADER =============================== -->
+    <header class="site-header">
+      <div class="container header-inner">
+        <a href="#" class="brand" aria-label="PsycheSpace home" data-home>
+          <span class="brand__logo" aria-hidden="true">☘︎</span>
+          <span class="brand__name">PsycheSpace</span>
+        </a>
+        <nav class="primary-nav" aria-label="Primary">
+          <ul>
+            <li><button class="link" data-open-learn>Learn More</button></li>
+            <li><a href="#signup" class="btn btn--ghost">Sign up</a></li>
+            <li><a href="#login" class="btn btn--solid">Log in</a></li>
+          </ul>
+        </nav>
+      </div>
+    </header>
+
+    <!-- =============================== MAIN =============================== -->
+    <main id="main" class="site-main">
+      <!-- ============== Landing (Welcome) ============== -->
+      <section class="home" aria-labelledby="home-title">
+        <div class="container home__wrap">
+          <div class="home__copy">
+            <h1 id="home-title">I can help you find your <span class="accent">happiness score</span></h1>
+            <p class="lead">But first... <br> I need to know a little more about you <span aria-hidden="true">:)</span></p>
+            <div class="home__cta">
+              <button class="btn btn--solid" data-start>Proceed</button>
+              <button class="btn btn--ghost" data-open-learn>Learn More</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============== Learn More Sheet ============== -->
+      <aside class="sheet" id="learnSheet" aria-hidden="true" aria-labelledby="lm-title" role="dialog">
+        <div class="sheet__panel" role="document">
+          <header class="sheet__header">
+            <h2 id="lm-title">Learn More</h2>
+            <button class="icon-btn" data-close-learn aria-label="Close">✕</button>
+          </header>
+          <div class="sheet__body">
+            <p>Click on the ‘Proceed’ button on the home page to answer a questionnaire that will help me determine a happiness score!</p>
+            <p>You will receive a list of things you can do in order to achieve a higher score, and thus improve your quality of life.</p>
+            <button class="btn btn--ghost" data-close-learn>Back</button>
+          </div>
+        </div>
+      </aside>
+
+      <!-- ============== Hero / Quiz Container ============== -->
+      <section class="hero is-hidden" data-quiz>
+        <div class="container hero__grid">
+          <div class="hero__copy">
+            <h2>Questionnaire</h2>
+            <p class="lead">Answer a few questions and get your personalized score.</p>
+          </div>
+
+          <div class="hero__panel">
+            <!-- Progress / Stepper -->
+            <aside class="stepper" aria-label="Question progress">
+              <div class="stepper__bar" aria-hidden="true"><span id="progressBar"></span></div>
+              <p class="stepper__label"><span id="stepNow">1</span>/<span id="stepTotal">12</span></p>
+            </aside>
+
+            <!-- Questionnaire -->
+            <form id="quizForm" novalidate>
+              <!-- Each .step is a single screen in the flow. Controlled by JS. -->
+
+              <section class="step" data-step="1" aria-labelledby="q1-label">
+                <h3 id="q1-label" class="step__title">What can we call you?</h3>
+                <label class="sr-only" for="name">Your name</label>
+                <input id="name" name="name" type="text" inputmode="text" placeholder="Type your name…" required />
+                <p class="muted">Awesome! Nice to meet you, <span class="token">{{name}}</span> :)</p>
+                <div class="step__actions">
+                  <button type="button" class="btn btn--solid" data-next>Next</button>
+                </div>
+              </section>
+
+              <section class="step" data-step="2" aria-labelledby="q2-label">
+                <h3 id="q2-label" class="step__title">How old are you? <span class="required">*</span></h3>
+                <p class="help">This will only be used for calculation purposes and nothing else.</p>
+                <input id="age" name="age" type="number" min="10" max="120" step="1" placeholder="e.g., 16" required />
+                <p class="muted">Great!</p>
+                <div class="step__actions">
+                  <button type="button" class="btn btn--ghost" data-prev>Back</button>
+                  <button type="button" class="btn btn--solid" data-next>Next</button>
+                </div>
+              </section>
+
+              <section class="step" data-step="3" aria-labelledby="q3-label">
+                <h3 id="q3-label" class="step__title">Which country do you live in?</h3>
+                <p class="help">This will only be used for calculation purposes and nothing else.</p>
+                <input id="country" name="country" type="text" placeholder="e.g., Qatar" />
+                <p class="muted">Awesome!</p>
+                <div class="step__actions">
+                  <button type="button" class="btn btn--ghost" data-prev>Back</button>
+                  <button type="button" class="btn btn--solid" data-next>Next</button>
+                </div>
+              </section>
+
+              <section class="step" data-step="4" aria-labelledby="q4-label">
+                <h3 id="q4-label" class="step__title">On a scale of 1–10, what is your exercise level?</h3>
+                <input id="exercise" name="exercise" type="range" min="1" max="10" value="5" />
+                <output for="exercise" id="exerciseOut">5</output>
+                <p class="muted">Got it...</p>
+                <div class="step__actions">
+                  <button type="button" class="btn btn--ghost" data-prev>Back</button>
+                  <button type="button" class="btn btn--solid" data-next>Next</button>
+                </div>
+              </section>
+
+              <section class="step" data-step="5" aria-labelledby="q5-label">
+                <h3 id="q5-label" class="step__title">What is your diet type?</h3>
+                <div class="chips">
+                  <label><input type="radio" name="diet" value="balanced" checked> <span>Balanced</span></label>
+                  <label><input type="radio" name="diet" value="vegetarian"> <span>Vegetarian</span></label>
+                  <label><input type="radio" name="diet" value="vegan"> <span>Vegan</span></label>
+                  <label><input type="radio" name="diet" value="fastfood"> <span>Fast‑food heavy</span></label>
+                </div>
+                <div class="step__actions">
+                  <button type="button" class="btn btn--ghost" data-prev>Back</button>
+                  <button type="button" class="btn btn--solid" data-next>Next</button>
+                </div>
+              </section>
+
+              <section class="step" data-step="6" aria-labelledby="q6-label">
+                <h3 id="q6-label" class="step__title">How many hours of sleep do you get on average?</h3>
+                <input id="sleep" name="sleep" type="number" min="0" max="24" step="0.5" placeholder="e.g., 7.5" />
+                <p class="muted">Noted...</p>
+                <div class="step__actions">
+                  <button type="button" class="btn btn--ghost" data-prev>Back</button>
+                  <button type="button" class="btn btn--solid" data-next>Next</button>
+                </div>
+              </section>
+
+              <section class="step" data-step="7" aria-labelledby="q7-label">
+                <h3 id="q7-label" class="step__title">On a scale of 1–10, what is your stress level?</h3>
+                <div class="range-row">
+                  <span class="range-label">Chilling</span>
+                  <input id="stress" name="stress" type="range" min="1" max="10" value="5" />
+                  <span class="range-label">Really Stressed</span>
+                </div>
+                <output for="stress" id="stressOut">5</output>
+                <p class="muted">Just a chill person, huh? Sure, sure…</p>
+                <div class="step__actions">
+                  <button type="button" class="btn btn--ghost" data-prev>Back</button>
+                  <button type="button" class="btn btn--solid" data-next>Next</button>
+                </div>
+              </section>
+
+              <section class="step" data-step="8" aria-labelledby="q8-label">
+                <h3 id="q8-label" class="step__title">Have you been previously diagnosed with any mental health condition?</h3>
+                <div class="chips">
+                  <label><input type="radio" name="diagnosed" value="no" checked> <span>No</span></label>
+                  <label><input type="radio" name="diagnosed" value="yes"> <span>Yes</span></label>
+                  <label><input type="radio" name="diagnosed" value="prefer-not"> <span>Prefer not to say</span></label>
+                </div>
+                <div class="step__actions">
+                  <button type="button" class="btn btn--ghost" data-prev>Back</button>
+                  <button type="button" class="btn btn--solid" data-next>Next</button>
+                </div>
+              </section>
+
+              <section class="step" data-step="9" aria-labelledby="q9-label">
+                <h3 id="q9-label" class="step__title">How many hours of work/school do you do a week?</h3>
+                <input id="work" name="work" type="number" min="0" max="120" step="1" placeholder="e.g., 40" />
+                <p class="muted">Gotta lock in gng</p>
+                <div class="step__actions">
+                  <button type="button" class="btn btn--ghost" data-prev>Back</button>
+                  <button type="button" class="btn btn--solid" data-next>Next</button>
+                </div>
+              </section>
+
+              <section class="step" data-step="10" aria-labelledby="q10-label">
+                <h3 id="q10-label" class="step__title">What is your average screen time per day?</h3>
+                <input id="screentime" name="screentime" type="number" min="0" max="24" step="0.5" placeholder="e.g., 3.5 (hours)" />
+                <div class="step__actions">
+                  <button type="button" class="btn btn--ghost" data-prev>Back</button>
+                  <button type="button" class="btn btn--solid" data-next>Next</button>
+                </div>
+              </section>
+
+              <section class="step" data-step="11" aria-labelledby="q11-label">
+                <h3 id="q11-label" class="step__title">What would you say your social interaction score is (1–10)?</h3>
+                <input id="social" name="social" type="range" min="1" max="10" value="6" />
+                <output for="social" id="socialOut">6</output>
+                <p class="muted">Awesome!</p>
+                <div class="step__actions">
+                  <button type="button" class="btn btn--ghost" data-prev>Back</button>
+                  <button type="button" class="btn btn--solid" data-next>Next</button>
+                </div>
+              </section>
+
+              <!-- Countdown / Result -->
+              <section class="step" data-step="12" aria-labelledby="q12-label" data-mode="countdown">
+                <h3 id="q12-label" class="step__title">I’ll give you your happiness score in…</h3>
+                <div class="countdown" aria-live="polite">
+                  <span class="bubble" data-num>3</span>
+                  <span class="bubble" data-num>2</span>
+                  <span class="bubble" data-num>1</span>
+                </div>
+                <div class="step__actions">
+                  <button type="button" class="btn btn--ghost" data-prev>Back</button>
+                  <button type="button" class="btn btn--solid" data-next>Reveal</button>
+                </div>
+              </section>
+
+              <section class="step" data-step="13" aria-labelledby="result-label" data-mode="result">
+                <h3 id="result-label" class="step__title">Your happiness score is:</h3>
+                <div class="scorecard">
+                  <output id="scoreOut" class="score">—</output>
+                  <p class="muted">(random number for demo)</p>
+                </div>
+                <div class="tips">
+                  <h4>In order to get an even higher score next time:</h4>
+                  <ul id="tipsList">
+                    <li>{{thing 1 to improve}}</li>
+                    <li>{{thing 2 to improve}}</li>
+                    <li>{{thing 3 to improve}}</li>
+                  </ul>
+                </div>
+                <div class="step__actions">
+                  <button type="button" class="btn btn--ghost" data-restart>Start over</button>
+                </div>
+              </section>
+            </form>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- =============================== FOOTER =============================== -->
+    <footer class="site-footer">
+      <div class="container footer-inner">
+        <p>&copy; <span id="year"></span> PsycheSpace. For demo purposes only.</p>
+        <nav aria-label="Legal">
+          <a href="#">Privacy</a>
+          <a href="#">Terms</a>
+          <a href="#">Contact</a>
+        </nav>
+      </div>
+    </footer>
+
+    <script src="/scripts/app.js" defer></script>
+  </body>
+</html>
+
