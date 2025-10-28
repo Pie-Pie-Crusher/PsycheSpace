@@ -4,7 +4,7 @@ from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
 
 # Import the trained model from models/model.py
-from models.model import model
+from training.py import model
 
 # Create the Flask app
 app = Flask(__name__, static_folder="website")
