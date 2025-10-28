@@ -238,33 +238,58 @@
   }
 
   // ---------------------------- Result ---------------------------------
-  function showResult() {
-    // simple demo score
-    const age = parseInt($('#age')?.value || '18', 10);
-    const ex  = parseInt($('#exercise')?.value || '5', 10);
-    const slp = parseFloat($('#sleep')?.value || '7', 10);
-    const str = parseInt($('#stress')?.value   || '5', 10);
-    const soc = parseInt($('#social')?.value   || '6', 10);
+  // ---------------------------- Result (uses model) ----------------------
+function showResult() {
+  // Gather input values
+  const payload = {
+    Country: $('#country')?.value || 'USA',
+    Age: parseInt($('#age')?.value || '30', 10),
+    Gender: $('#gender')?.value || 'Male',
+    "Exercise Level": parseInt($('#exercise')?.value || '5', 10) <= 3 ? 'Low' : 'Moderate',
+    "Diet Type": $('#diet')?.value || 'Balanced',
+    "Sleep Hours": parseFloat($('#sleep')?.value || '7'),
+    "Stress Level": parseInt($('#stress')?.value || '5') <= 3 ? 'Low' : 'High',
+    "Mental Health Condition": $('#mental')?.value || 'None',
+    "Work Hours per Week": parseInt($('#work')?.value || '40', 10),
+    "Screen Time per Day (Hours)": parseFloat($('#screen')?.value || '3'),
+    "Social Interaction Score": parseInt($('#social')?.value || '5', 10)
+  };
 
-    const raw = Math.round(
-      55 + (Math.random() * 25) + ex*1.7 + (slp-7)*1.2 - str*1.2 + soc*0.9 - Math.max(0, age-50)*0.2
-    );
-    const score = clamp(raw, 0, 100);
-    scoreOut.textContent = String(score);
+  fetch('http://127.0.0.1:5000/predict', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload)
+  })
+  .then(response => response.json())
+  .then(data => {
+    if (data.prediction !== undefined) {
+      const score = clamp(Math.round(data.prediction), 0, 100);
+      scoreOut.textContent = String(score);
+    } else if (data.error) {
+      console.error("Prediction error:", data.error);
+      scoreOut.textContent = "Error";
+    }
+  })
+  .catch(err => {
+    console.error("Request failed:", err);
+    scoreOut.textContent = "Error";
+  });
 
-    const suggestions = [
-      'Try a 20-minute walk three times this week',
-      'Aim for a consistent sleep schedule (±30 minutes)',
-      'Swap one sugary drink for water each day',
-      'Do a 5-minute breathwork break when stress spikes',
-      'Schedule one social check-in with a friend',
-      'Reduce late-night screen time by 15 minutes',
-      'Add a serving of fruit/veg to lunch',
-    ];
-    const picks = new Set();
-    while (picks.size < 3) picks.add(Math.floor(Math.random() * suggestions.length));
-    tipsList.innerHTML = [...picks].map(i => `<li>${suggestions[i]}</li>`).join('');
-  }
+  // Suggestions (still random tips)
+  const suggestions = [
+    'Try a 20-minute walk three times this week',
+    'Aim for a consistent sleep schedule (±30 minutes)',
+    'Swap one sugary drink for water each day',
+    'Do a 5-minute breathwork break when stress spikes',
+    'Schedule one social check-in with a friend',
+    'Reduce late-night screen time by 15 minutes',
+    'Add a serving of fruit/veg to lunch',
+  ];
+  const picks = new Set();
+  while (picks.size < 3) picks.add(Math.floor(Math.random() * suggestions.length));
+  tipsList.innerHTML = [...picks].map(i => `<li>${suggestions[i]}</li>`).join('');
+}
+
 
   // --------------------------- Reset Flow -------------------------------
   function resetForm() {
