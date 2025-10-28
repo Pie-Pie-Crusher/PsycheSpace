@@ -6,7 +6,7 @@ from sklearn.preprocessing import OneHotEncoder, RobustScaler
 # -----------------------------
 # 1️⃣ Load dataset
 # -----------------------------
-df = pd.read_csv("Data/sample_101_Mental_Health_Lifestyle_Dataset.csv")  # Replace with your CSV filename
+df = pd.read_csv("data/sample_101_Mental_Health_Lifestyle_Dataset copy 2.csv")  # Replace with your CSV filename
 print(f"Loaded dataset with {df.shape[0]} rows and {df.shape[1]} columns.")
 
 # -----------------------------
