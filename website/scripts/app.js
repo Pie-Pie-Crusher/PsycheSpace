@@ -10,6 +10,7 @@
 // ======================================================================
 (() => {
   'use strict';
+  console.log('App.js loaded successfully!');
 
   // --------------------------- Utilities -------------------------------
   const $  = (sel, root = document) => root.querySelector(sel);
@@ -158,6 +159,9 @@
 
     // Proceed -> show quiz
     if (t.matches('[data-start]')) {
+      console.log('Proceed button clicked!');
+      console.log('home element:', home);
+      console.log('quizSection element:', quizSection);
       home?.classList.add('is-hidden');
       quizSection?.classList.remove('is-hidden');
       showStep(0);
