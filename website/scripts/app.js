@@ -10,6 +10,7 @@
 // ======================================================================
 (() => {
   'use strict';
+  console.log('App.js loaded successfully!');
 
   // --------------------------- Utilities -------------------------------
   const $  = (sel, root = document) => root.querySelector(sel);
@@ -158,6 +159,9 @@
 
     // Proceed -> show quiz
     if (t.matches('[data-start]')) {
+      console.log('Proceed button clicked!');
+      console.log('home element:', home);
+      console.log('quizSection element:', quizSection);
       home?.classList.add('is-hidden');
       quizSection?.classList.remove('is-hidden');
       showStep(0);
@@ -255,7 +259,7 @@ function showResult() {
     "Social Interaction Score": parseInt($('#social')?.value || '5', 10)
   };
 
-  fetch('http://127.0.0.1:5000/predict', {
+  fetch('http://127.0.0.1:5001/predict', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(payload)
