@@ -288,6 +288,15 @@ function showResult() {
     'Schedule one social check-in with a friend',
     'Reduce late-night screen time by 15 minutes',
     'Add a serving of fruit/veg to lunch',
+    'Go somewhere you have not been before',
+    'Try a drink you have never tried before',
+    'Dedicate five minutes of your day every day to meditation',
+    'Spend more time with your family',
+    'Try on a face mask before you go to sleep',
+    'Take a 20-minute nap after school or work to recharge',
+    'Watch a comfort show or movie',
+    'Reorganize your clothes or your desk',    
+
   ];
   const picks = new Set();
   while (picks.size < 3) picks.add(Math.floor(Math.random() * suggestions.length));
