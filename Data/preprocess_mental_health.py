@@ -1,12 +1,11 @@
 import pandas as pd
 import numpy as np
-from scipy import stats
 from sklearn.preprocessing import OneHotEncoder, RobustScaler
 
 # -----------------------------
 # 1️⃣ Load dataset
 # -----------------------------
-df = pd.read_csv("data/sample_101_Mental_Health_Lifestyle_Dataset copy 2.csv")  # Replace with your CSV filename
+df = pd.read_csv("data/sample_101_Mental_Health_Lifestyle_Dataset copy 2.csv")
 print(f"Loaded dataset with {df.shape[0]} rows and {df.shape[1]} columns.")
 
 # -----------------------------
@@ -27,18 +26,20 @@ categorical_cols = df.select_dtypes(include=['object']).columns.tolist()
 df[categorical_cols] = df[categorical_cols].fillna(df[categorical_cols].mode().iloc[0])
 
 # -----------------------------
-# 4️⃣ Encode categorical columns
+# 4️⃣ Encode categorical columns (excluding Country and Gender)
 # -----------------------------
-# Encode all categorical columns
+exclude_cols = ["Country", "Gender"]  # columns to exclude from encoding
+categorical_to_encode = [col for col in categorical_cols if col not in exclude_cols]
+
 encoder = OneHotEncoder(sparse_output=False, handle_unknown="ignore")
 encoded = pd.DataFrame(
-    encoder.fit_transform(df[categorical_cols]),
-    columns=encoder.get_feature_names_out(categorical_cols),
+    encoder.fit_transform(df[categorical_to_encode]),
+    columns=encoder.get_feature_names_out(categorical_to_encode),
     index=df.index
 )
 
-# Drop original categorical columns and concatenate encoded
-df = df.drop(columns=categorical_cols)
+# Drop original encoded columns and concatenate encoded
+df = df.drop(columns=categorical_to_encode)
 df = pd.concat([df, encoded], axis=1)
 
 # -----------------------------
@@ -53,7 +54,6 @@ for col in numeric_cols:
     upper = Q3 + 1.5 * IQR
     outlier_flags[f"{col}_outlier"] = (df[col] < lower) | (df[col] > upper)
 
-# Combined row-level outlier flag
 outlier_flags["any_outlier"] = outlier_flags.any(axis=1)
 outlier_flags.to_csv("outliers_report.csv", index=False)
 print(f"Outlier flags saved to 'outliers_report.csv'.")
